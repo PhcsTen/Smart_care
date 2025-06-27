@@ -1,6 +1,11 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_jwt_extended import (JWTManager,create_access_token,jwt_required,get_jwt_identity,)
+from flask_jwt_extended import (
+    JWTManager,
+    create_access_token,
+    jwt_required,
+    get_jwt_identity,
+)
 import mysql.connector
 from mysql.connector import Error
 from dotenv import load_dotenv
@@ -11,8 +16,9 @@ import bcrypt
 # ✅ ฟังก์ชันแฮชรหัสผ่านก่อนบันทึก
 def hash_password(plain_password):
     salt = bcrypt.gensalt()
-    hashed = bcrypt.hashpw(plain_password.encode('utf-8'), salt)
+    hashed = bcrypt.hashpw(plain_password.encode("utf-8"), salt)
     return hashed
+
 
 # โหลดค่า .env
 load_dotenv()
@@ -56,12 +62,12 @@ def login():
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute(
-            "SELECT * FROM users WHERE user_name = %s", (username,)
-        )
+        cursor.execute("SELECT * FROM users WHERE user_name = %s", (username,))
         user = cursor.fetchone()
 
-        if user and bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
+        if user and bcrypt.checkpw(
+            password.encode("utf-8"), user["password"].encode("utf-8")
+        ):
             access_token = create_access_token(identity=username)
             return jsonify({"access_token": access_token}), 200
         else:
@@ -73,6 +79,7 @@ def login():
     finally:
         cursor.close()
         conn.close()
+
 
 # ✅ สร้าง API GET สำหรับดึงข้อมูลเฉพาะ user
 @app.route("/user/me", methods=["GET"])
@@ -88,11 +95,13 @@ def get_current_user():
         if not user:
             return jsonify({"message": "User not found"}), 404
 
-        return jsonify({
-            "user_id": user["user_id"],
-            "user_name": user["user_name"],
-            "email": user["email"],
-        })
+        return jsonify(
+            {
+                "user_id": user["user_id"],
+                "user_name": user["user_name"],
+                "email": user["email"],
+            }
+        )
 
     except Exception as e:
         return jsonify({"message": str(e)}), 500
@@ -100,6 +109,7 @@ def get_current_user():
     finally:
         cursor.close()
         conn.close()
+
 
 # ✅ สร้าง API GET สำหรับดึงข้อมูล user
 @app.route("/user", methods=["GET"])
@@ -133,6 +143,7 @@ def get_user_info():
             cursor.close()
         if conn:
             conn.close()
+
 
 # ✅ สร้าง API GET สำหรับเพิ่มข้อมูล user
 @app.route("/user/insert", methods=["POST"])
@@ -183,6 +194,7 @@ def insert_user():
         if conn:
             conn.close()
 
+
 # ✅ สร้าง API GET สำหรับอัปเดตข้อมูล user
 @app.route("/user/update/<int:user_id>", methods=["PUT"])
 @jwt_required()
@@ -190,6 +202,9 @@ def update_user(user_id):
     data = request.get_json()
     user_name = data.get("user_name")
     email = data.get("email")
+    password = data.get("password")  # อาจจะ None
+    
+    # print("password in request:", password)
 
     if not user_name or not email:
         return jsonify({"message": "Missing required fields"}), 400
@@ -197,19 +212,46 @@ def update_user(user_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute(
-            "UPDATE users SET user_name = %s, email = %s, updated_date = NOW() WHERE user_id = %s",
-            (user_name, email, user_id),
-        )
+
+        # ถ้ามีการส่ง password → อัปเดตรหัสผ่านด้วย
+        if password:
+            hashed_password = hash_password(password)
+            cursor.execute(
+                """
+                UPDATE users
+                SET user_name = %s,
+                    email = %s,
+                    password = %s,
+                    updated_date = NOW()
+                WHERE user_id = %s
+                """,
+                (user_name, email, hashed_password, user_id),
+            )
+        else:
+            # ไม่ส่ง password → ไม่อัปเดต password
+            cursor.execute(
+                """
+                UPDATE users
+                SET user_name = %s,
+                    email = %s,
+                    updated_date = NOW()
+                WHERE user_id = %s
+                """,
+                (user_name, email, user_id),
+            )
+
         conn.commit()
         return jsonify({"message": "User updated successfully"}), 200
+
     except Exception as e:
         return jsonify({"message": str(e)}), 500
+
     finally:
         if cursor:
             cursor.close()
         if conn:
             conn.close()
+
 
 # ✅ สร้าง API GET สำหรับลบข้อมูล user
 @app.route("/user/delete/<int:user_id>", methods=["DELETE"])
