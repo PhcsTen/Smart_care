@@ -219,7 +219,7 @@
         >
           <v-row>
             <v-col cols="12" md="6">
-              <!-- ชื่อผู้ใช้ -->
+              <!-- ชื่อผู้ใช้ disabled เมื่อ edit -->
               <v-text-field
                 v-model="record.user_name"
                 label="ชื่อผู้ใช้"
@@ -227,6 +227,7 @@
                 color="success"
                 class="custom-input"
                 :rules="[required]"
+                :disabled="isEditing"
               />
             </v-col>
             <v-col cols="12" md="6">
@@ -240,8 +241,8 @@
                 :rules="[required, emailRule]"
               />
             </v-col>
-            <!-- รหัสผ่านและยืนยันรหัสผ่าน แสดงเฉพาะตอนเพิ่ม -->
-            <v-col cols="12" md="6" v-if="!isEditing">
+            <!-- รหัสผ่าน -->
+            <v-col cols="12" md="6">
               <v-text-field
                 v-model="record.password"
                 label="รหัสผ่าน"
@@ -249,10 +250,12 @@
                 variant="outlined"
                 color="success"
                 class="custom-input"
-                :rules="[required]"
+                :rules="isEditing ? [] : [required]"
               />
             </v-col>
-            <v-col cols="12" md="6" v-if="!isEditing">
+
+            <!-- ยืนยันรหัสผ่าน -->
+            <v-col cols="12" md="6">
               <v-text-field
                 v-model="record.confirmPassword"
                 label="ยืนยันรหัสผ่าน"
@@ -260,7 +263,7 @@
                 variant="outlined"
                 color="success"
                 class="custom-input"
-                :rules="[required, passwordMatch]"
+                :rules="isEditing ? [] : [required, passwordMatch]"
               />
             </v-col>
           </v-row>
@@ -362,14 +365,23 @@ const passwordMatch = (value) =>
 
 // ตรวจสอบว่าแบบฟอร์มผ่าน validation หรือไม่
 const isFormValid = computed(() => {
+  const baseValid = record.value.user_name && record.value.email;
+
   if (isEditing.value) {
-    // ถ้าแก้ไข ไม่ต้องกรอกรหัสผ่าน
-    return record.value.user_name && record.value.email;
+    // ถ้าแก้ไข → ถ้ากรอกรหัสผ่านใหม่ ต้องตรงกับ confirmPassword
+    if (record.value.password || record.value.confirmPassword) {
+      return (
+        baseValid &&
+        record.value.password &&
+        record.value.confirmPassword &&
+        record.value.password === record.value.confirmPassword
+      );
+    }
+    return baseValid; // ไม่กรอกรหัสผ่านใหม่ → ผ่านได้
   } else {
-    // เพิ่มข้อมูล ต้องกรอกครบและรหัสผ่านต้องตรงกัน
+    // เพิ่ม → ต้องกรอกครบ
     return (
-      record.value.user_name &&
-      record.value.email &&
+      baseValid &&
       record.value.password &&
       record.value.confirmPassword &&
       record.value.password === record.value.confirmPassword
@@ -434,8 +446,8 @@ function edit(id) {
   isEditing.value = true;
   const found = users.value.find((user) => user.user_id === id);
   if (found) {
-    record.value = { ...found };
-    //record.value = { ...DEFAULT_RECORD };
+    // ใช้ DEFAULT + ข้อมูลที่พบ เพื่อให้มี password/confirmPassword = ""
+    record.value = { ...DEFAULT_RECORD, ...found };
     dialog.value = true;
   }
 }
@@ -475,8 +487,12 @@ async function save() {
     const payload = {
       user_name: record.value.user_name,
       email: record.value.email,
-      password: record.value.password,
     };
+
+    // เพิ่มเฉพาะตอนเพิ่ม หรือกรอก password ใหม่
+    if (!isEditing.value || record.value.password) {
+      payload.password = record.value.password;
+    }
 
     const config = {
       headers: {
@@ -485,6 +501,8 @@ async function save() {
     };
 
     if (isEditing.value) {
+      // ตรวจรหัสผ่าน
+      // console.log("payload before update:", payload);
       // แก้ไข
       await axios.put(
         `${API_BASE_URL}/user/update/${record.value.user_id}`, // ✅ URL ที่ถูกต้อง
