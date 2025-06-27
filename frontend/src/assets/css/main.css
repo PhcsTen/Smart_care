@@ -1,0 +1,171 @@
+/* ------------------------------
+   style พื้นหลังหลัก
+------------------------------- */
+body {
+  font-family: 'Prompt', sans-serif;
+}
+
+.menu-bg {
+  background-color: #246590;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+}
+
+.vector-bg {
+  background-color: #f5f7fa;
+  background-image: url('@/assets/vector-bg.png'); 
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  min-height: 100vh;
+}
+/* ------------------------------
+   การจัดตำแหน่งกึ่งกลาง
+------------------------------- */
+.center-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* ------------------------------
+   การเข้าสู่ระบบ
+------------------------------- */
+.login-container {
+  width: 100%;
+  max-width: 380px;
+  padding: 40px 30px;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  text-align: center;
+}
+
+/* ------------------------------
+   การจัดแต่งโลโก้
+------------------------------- */
+.logo {
+  margin-bottom: 20px;
+}
+
+.logo img {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e1e5ee;
+}
+
+/* ------------------------------
+   การจัดแต่งชื่อเรื่อง
+------------------------------- */
+.login-title {
+  color: #2c3e50;
+  margin-bottom: 30px;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+/* ------------------------------
+   Input
+------------------------------- */
+.vector-input {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  border: 2px solid #e1e5ee;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  color: #2c3e50;
+}
+
+.vector-input:focus {
+  border-color: #3498db;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+  outline: none;
+}
+
+.vector-input::placeholder {
+  color: #95a5a6;
+}
+
+/* ------------------------------
+   ปุ่ม Login
+------------------------------- */
+.vector-button {
+  width: 100%;
+  padding: 14px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.vector-button:hover:enabled {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(41, 128, 185, 0.3);
+}
+
+.vector-button:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+/* ------------------------------
+   ลืม password link
+------------------------------- */
+.forgot-password {
+  color: #3498db;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+/* ------------------------------
+   style ข้อตวาม 
+------------------------------- */
+.message {
+  margin-top: 15px;
+  color: #e74c3c;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ------------------------------
+   style footer 
+------------------------------- */
+.custom-footer {
+  background-color: #3498db !important; /* เขียวเข้ม */
+  color: white !important;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* ------------------------------
+   style home_view
+------------------------------- */
+.custom-card {
+  transition: transform 0.3s ease;
+}
+.custom-card:hover {
+  transform: scale(1.05);
+}
