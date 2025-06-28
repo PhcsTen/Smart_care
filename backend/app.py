@@ -12,8 +12,7 @@ from dotenv import load_dotenv
 import os
 import bcrypt
 
-
-# ✅ ฟังก์ชันแฮชรหัสผ่านก่อนบันทึก
+# ฟังก์ชันแฮชรหัสผ่านก่อนบันทึก
 def hash_password(plain_password):
     salt = bcrypt.gensalt()
     hashed = bcrypt.hashpw(plain_password.encode("utf-8"), salt)
@@ -46,7 +45,7 @@ def get_db_connection():
         raise
 
 
-# ✅ สร้าง API POST สำหรับ Login
+# สร้าง API POST สำหรับ Login
 @app.route("/login", methods=["POST"])
 def login():
     if not request.is_json:
@@ -59,6 +58,8 @@ def login():
     if not username or not password:
         return jsonify({"message": "username and password are required"}), 400
 
+    conn = None
+    cursor = None  # กำหนดไว้ก่อน
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
@@ -77,16 +78,20 @@ def login():
         return jsonify({"message": str(e)}), 500
 
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 
-# ✅ สร้าง API GET สำหรับดึงข้อมูลเฉพาะ user
+# สร้าง API GET สำหรับดึงข้อมูลเฉพาะ user
 @app.route("/user/me", methods=["GET"])
 @jwt_required()
 def get_current_user():
     username = get_jwt_identity()
 
+    conn = None
+    cursor = None  # กำหนดไว้ก่อน
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
@@ -107,16 +112,20 @@ def get_current_user():
         return jsonify({"message": str(e)}), 500
 
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 
-# ✅ สร้าง API GET สำหรับดึงข้อมูล user
+# สร้าง API GET สำหรับดึงข้อมูล user
 @app.route("/user", methods=["GET"])
 @jwt_required()  # บังคับให้ต้องมี JWT access token
 def get_user_info():
     current_user = get_jwt_identity()  # ดึงข้อมูล identity จาก token
 
+    conn = None
+    cursor = None  # กำหนดไว้ก่อน
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -145,7 +154,7 @@ def get_user_info():
             conn.close()
 
 
-# ✅ สร้าง API GET สำหรับเพิ่มข้อมูล user
+# สร้าง API GET สำหรับเพิ่มข้อมูล user
 @app.route("/user/insert", methods=["POST"])
 @jwt_required()
 def insert_user():
@@ -162,6 +171,8 @@ def insert_user():
     if not user_name or not email or not password:
         return jsonify({"message": "Missing required fields"}), 400
 
+    conn = None
+    cursor = None  # กำหนดไว้ก่อน
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -173,7 +184,7 @@ def insert_user():
         if existing_user:
             return jsonify({"error": "Username already exists"}), 409  # Conflict
 
-        # ✅ เพิ่มผู้ใช้ใหม่
+        # เพิ่มผู้ใช้ใหม่
         cursor.execute(
             """
             INSERT INTO users (user_name, password, email, created_date, updated_date)
@@ -195,7 +206,7 @@ def insert_user():
             conn.close()
 
 
-# ✅ สร้าง API GET สำหรับอัปเดตข้อมูล user
+# สร้าง API GET สำหรับอัปเดตข้อมูล user
 @app.route("/user/update/<int:user_id>", methods=["PUT"])
 @jwt_required()
 def update_user(user_id):
@@ -203,12 +214,14 @@ def update_user(user_id):
     user_name = data.get("user_name")
     email = data.get("email")
     password = data.get("password")  # อาจจะ None
-    
+
     # print("password in request:", password)
 
     if not user_name or not email:
         return jsonify({"message": "Missing required fields"}), 400
 
+    conn = None
+    cursor = None  # กำหนดไว้ก่อน
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -253,10 +266,13 @@ def update_user(user_id):
             conn.close()
 
 
-# ✅ สร้าง API GET สำหรับลบข้อมูล user
+# สร้าง API GET สำหรับลบข้อมูล user
 @app.route("/user/delete/<int:user_id>", methods=["DELETE"])
 @jwt_required()
 def delete_user(user_id):
+
+    conn = None
+    cursor = None  # กำหนดไว้ก่อน
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
