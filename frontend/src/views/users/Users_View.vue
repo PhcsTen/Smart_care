@@ -446,8 +446,13 @@ function edit(id) {
   isEditing.value = true;
   const found = users.value.find((user) => user.user_id === id);
   if (found) {
-    // ใช้ DEFAULT + ข้อมูลที่พบ เพื่อให้มี password/confirmPassword = ""
-    record.value = { ...DEFAULT_RECORD, ...found };
+    const password = ""; // หรือจะใส่ค่าจาก found.password ก็ได้ (ถ้าจำเป็น)
+    record.value = {
+      ...DEFAULT_RECORD,
+      ...found,
+      password,
+      confirmPassword: password,
+    };
     dialog.value = true;
   }
 }
