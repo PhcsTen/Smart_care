@@ -11,6 +11,7 @@ from mysql.connector import Error
 from dotenv import load_dotenv
 import os
 import bcrypt
+from fastapi import FastAPI
 
 # ฟังก์ชันแฮชรหัสผ่านก่อนบันทึก
 def hash_password(plain_password):
