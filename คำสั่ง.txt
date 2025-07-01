@@ -24,10 +24,12 @@
 ติดตั้งใน vuetify
 1.>npm install axios
 
-คำสั้ง run
+คำสั้ง run ภายใต้ .env
 	1.flask run
 	2.python app.py
-	2.uvicorn app:app --reload
+	3.uvicorn app:app --reload
+	3.flask run --host=0.0.0.0 --port=5000 # คำสั้ง run Production จริง
+	
 ออกจาก env
 	1.python3 -m venv .venv
 	2.deactivate
