@@ -39,6 +39,29 @@
 
       <p class="forgot-password">Forgot Password?</p>
       <p v-if="message" class="message">{{ message }}</p>
+      <p>-------------</p>
+      <div
+        class="text-caption message"
+        style="
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%);
+          bottom: 16px;
+          color: blue;
+        "
+      >
+        &copy; 2025-{{ new Date().getFullYear() }}
+        <span class="d-none d-sm-inline-block">Smart Care System</span>
+        <a
+          class="text-decoration-none"
+          href="https://www.google.com/"
+          rel="noopener noreferrer"
+          target="_blank"
+          style="color: blue"
+        >
+          Tech Five Studio
+        </a>
+      </div>
     </div>
   </v-main>
 </template>
@@ -79,6 +102,8 @@ const handleLogin = async () => {
       message.value = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
     }
   } catch (err) {
+    // Login failed
+    console.log("❌ Login failed:", err.response?.data || err.message);
     if (err.response && err.response.data?.message) {
       message.value = err.response.data.message;
     } else {
@@ -93,7 +118,8 @@ const handleLogin = async () => {
 async function getCurrentUser() {
   try {
     const token = localStorage.getItem("access_token");
-    console.log("🔑 Token:", token);
+    // ดู token ที่ได้จากการ Login
+    console.log("Token:", token);
 
     if (!token) throw new Error("Token not found");
 
@@ -104,15 +130,15 @@ async function getCurrentUser() {
     });
 
     const user = response.data;
-    console.log("✅ ข้อมูลผู้ใช้:", user);
+    //console.log("ข้อมูลผู้ใช้:", user);
 
-    // ✅ บันทึกข้อมูลผู้ใช้ลง localStorage
+    // บันทึกข้อมูลผู้ใช้ลง localStorage
     localStorage.setItem("user", JSON.stringify(user));
 
     return user;
-
   } catch (error) {
-    const msg = error.response?.data?.message || error.message || "Unknown error";
+    const msg =
+      error.response?.data?.message || error.message || "Unknown error";
     console.error("⛔ ดึงข้อมูลผู้ใช้ล้มเหลว:", msg);
 
     if (error.response?.status === 401) {
@@ -123,7 +149,6 @@ async function getCurrentUser() {
     return null;
   }
 }
-
 </script>
 
 <style scoped></style>

@@ -169,3 +169,61 @@ body {
 .custom-card:hover {
   transform: scale(1.05);
 }
+
+/*---------------------------------
+  style table_view
+----------------------------------*/
+
+
+.custom-table {
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.custom-table th {
+  font-weight: bold;
+}
+
+.ellipsis {
+  display: inline-block;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-back {
+  margin-right: 8px;
+}
+
+.dialog-popup {
+  border-radius: 8px;
+}
+
+.dialog-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.confirm-delete-dialog {
+  border-radius: 8px;
+}
+
+.confirm-delete-title {
+  background-color: #f44336;
+  color: white;
+  padding: 16px;
+}
+
+.confirm-delete-text {
+  padding: 20px 16px;
+  font-size: 1rem;
+}
+
+.confirm-delete-actions {
+  padding: 8px 16px 16px;
+}
+
+.snackbar-fullscreen {
+  border-radius: 0;
+}

@@ -1,39 +1,4 @@
 <template>
-  <v-navigation-drawer
-    v-model="drawer"
-    expand-on-hover
-    rail
-    app
-    style="background-color: "
-  >
-    <v-list>
-      <v-list-item>
-        <template #prepend>
-          <v-avatar size="40">
-            <v-img src="@/assets/image/logo.png" alt="Logo" />
-          </v-avatar>
-        </template>
-        <v-list-item-title>เด็กๆ</v-list-item-title>
-        <v-list-item-subtitle>Smart Care Home</v-list-item-subtitle>
-      </v-list-item>
-    </v-list>
-
-    <v-divider></v-divider>
-
-    <!-- เมนูหลักจาก menuItemsData -->
-    <v-list density="compact" nav>
-      <v-list-item
-        v-for="(item, i) in menuItems"
-        :key="i"
-        @click="handleMenuClick(item)"
-      >
-        <template #prepend>
-          <v-icon>{{ item.icon }}</v-icon>
-        </template>
-        <v-list-item-title>{{ item.title }}</v-list-item-title>
-      </v-list-item>
-    </v-list>
-  </v-navigation-drawer>
   <!-- บริการหลักในหน้า Home -->
   <v-container>
     <v-row class="mt-4" justify="center">
@@ -80,7 +45,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import menuItemsData from "@/views/menu/menuItemsData";
+// import menuItemsData from "@/views/menu/menuItemsData";
 import AppBar from "@/views/appbar/AppBar.vue";
 
 const drawer = ref(true);
@@ -92,108 +57,109 @@ onMounted(() => {
     router.push("/login");
   }
 });
-
-const menuItems = menuItemsData;
-
-const logout = () => {
-  localStorage.removeItem("access_token");
-  router.push("/login");
-};
-
-const handleMenuClick = (item) => {
-  if (item.click === "logout") {
-    logout();
-  } else if (item.href) {
-    router.push(item.href);
-  }
-};
 const services = [
-  {
-    index: "1",
-    name: "เซ็คชื่อ/ตรวจสุขภาพเด็ก",
-    icon: "mdi-home",
-    color: "success",
-    background: "#e0f7fa",
-    router: "",
-  },
-  {
-    index: "2",
-    name: "บันทึกกิจกรรมประจำวัน",
-    color: "info",
-    icon: "mdi-eye",
-    router: "",
-  },
-  {
-    index: "3",
-    name: "อาหารกลางวัน",
-    color: "orange darken-2",
-    icon: "mdi-chat",
-    router: "",
-  },
-  {
-    index: "4",
-    name: "บันทึกสังเกตพฤติกรรม",
-    color: "purple",
-    icon: "mdi-chart-bar",
-    router: "",
-  },
-  {
-    index: "5",
-    name: "แหล่งเรียนรู้",
-    color: "#9370DB", // Medium Purple (Hex)
-    icon: "mdi-chart-bar",
-    router: "",
-  },
-  {
-    index: "6",
-    name: "โครงการฯ",
-    color: "#E6E6FA", // Lavender
-    icon: "mdi-plus",
-    router: "",
-  },
-  {
-    index: "7",
-    name: "แบบบันทึกพัฒนาการเด็ก",
-    color: "#9400D3", // Dark Violet
-    icon: "mdi-bell",
-    router: "",
-  },
-  {
-    index: "8",
-    name: "บันทึกนำ้หนักส่วนสูง",
-    color: "red",
-    icon: "mdi-file-document",
-    router: "",
-  },
+  // {
+  //   index: "1",
+  //   name: "เซ็คชื่อ/ตรวจสุขภาพเด็ก",
+  //   icon: "mdi-home",
+  //   color: "success",
+  //   background: "#e0f7fa",
+  //   router: "",
+  // },
+  // {
+  //   index: "2",
+  //   name: "บันทึกกิจกรรมประจำวัน",
+  //   color: "info",
+  //   icon: "mdi-eye",
+  //   router: "",
+  // },
+  // {
+  //   index: "3",
+  //   name: "อาหารกลางวัน",
+  //   color: "orange darken-2",
+  //   icon: "mdi-chat",
+  //   router: "",
+  // },
+  // {
+  //   index: "4",
+  //   name: "บันทึกสังเกตพฤติกรรม",
+  //   color: "purple",
+  //   icon: "mdi-chart-bar",
+  //   router: "",
+  // },
+  // {
+  //   index: "5",
+  //   name: "แหล่งเรียนรู้",
+  //   color: "#9370DB", // Medium Purple (Hex)
+  //   icon: "mdi-chart-bar",
+  //   router: "",
+  // },
+  // {
+  //   index: "6",
+  //   name: "โครงการฯ",
+  //   color: "#E6E6FA", // Lavender
+  //   icon: "mdi-plus",
+  //   router: "",
+  // },
+  // {
+  //   index: "7",
+  //   name: "แบบบันทึกพัฒนาการเด็ก",
+  //   color: "#9400D3", // Dark Violet
+  //   icon: "mdi-bell",
+  //   router: "",
+  // },
+  // {
+  //   index: "8",
+  //   name: "บันทึกนำ้หนักส่วนสูง",
+  //   color: "red",
+  //   icon: "mdi-file-document",
+  //   router: "",
+  // },
   {
     index: "9",
-    name: "ข้อมูลเด็กนักเรียน",
-    color: "red",
-    icon: "mdi-file-document",
-    router: "",
+    name: "นักเรียน",
+    color: "#03a9f4",
+    icon: "mdi-account-school-outline",
+    router: "/students",
   },
   {
     index: "10",
-    name: "ข้อมูลครู",
-    color: "red",
-    icon: "mdi-file-document",
-    router: "",
+    name: "ครู",
+    color: "#ff5800",
+    icon: "mdi-account-badge-outline",
+    router: "/teacher",
   },
   {
     index: "11",
-    name: "ข้อมูลบ้านนักเรียน",
-    color: "red",
-    icon: "mdi-file-document",
-    router: "",
+    name: "ห้องเรียน/ระดับชั้น",
+    color: "#f500ff",
+    icon: "mdi-google-classroom",
+    router: "/classrooms",
   },
   {
     index: "12",
-    name: "แบบรายงาน",
-    color: "red",
-    icon: "mdi-file-document",
+    name: "ปีการศึกษา",
+    color: "#ffffff",
+    icon: "mdi-calendar-clock",
+    router: "/years",
+  },
+  {
+    index: "13",
+    name: "สมาชิก",
+    color: "#00ff00",
+    icon: "mdi-account-group-outline",
+    router: "/users",
+  },
+  {
+    index: "14",
+    name: "ตั้งค่า",
+    color: "#00ffff",
+    icon: "mdi-cog",
     router: "",
   },
+  
 ];
 </script>
 
-<style scoped></style>
+<style scoped>
+</style>

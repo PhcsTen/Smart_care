@@ -18,7 +18,7 @@
       style="position: absolute; right: 16px; color: #cccccc"
     >
       &copy; 2025-{{ new Date().getFullYear() }}
-      <span class="d-none d-sm-inline-block">Smart Care</span>
+      <span class="d-none d-sm-inline-block">Smart Care System</span>
       —
       <a
         class="text-decoration-none"

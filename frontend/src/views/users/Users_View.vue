@@ -1,37 +1,4 @@
 <template>
-  <!-- Navigation Drawer เมนูด้านข้าง -->
-  <v-navigation-drawer v-model="drawer" expand-on-hover rail app>
-    <v-list>
-      <v-list-item>
-        <!-- โลโก้แอป -->
-        <template #prepend>
-          <v-avatar size="40">
-            <v-img src="@/assets/image/logo.png" alt="Logo" />
-          </v-avatar>
-        </template>
-        <!-- ชื่อแอป -->
-        <v-list-item-title>เด็กๆ</v-list-item-title>
-        <v-list-item-subtitle>Smart Care Users</v-list-item-subtitle>
-      </v-list-item>
-    </v-list>
-
-    <v-divider></v-divider>
-
-    <!-- รายการเมนูหลัก -->
-    <v-list density="compact" nav>
-      <v-list-item
-        v-for="(item, i) in menuItems"
-        :key="i"
-        @click="handleMenuClick(item)"
-      >
-        <template #prepend>
-          <v-icon>{{ item.icon }}</v-icon>
-        </template>
-        <v-list-item-title>{{ item.title }}</v-list-item-title>
-      </v-list-item>
-    </v-list>
-  </v-navigation-drawer>
-
   <!-- App Bar ด้านบน มีปุ่ม toggle drawer -->
   <AppBar @toggle-drawer="drawer = !drawer" />
 
@@ -50,7 +17,7 @@
         <v-col cols="auto" class="pa-0 ml-3">
           <!-- ปุ่มเพิ่มสมาชิก -->
           <v-btn color="success" @click="add">
-            <v-icon start>mdi-plus</v-icon>
+            <v-icon start>mdi-account-group-outline</v-icon>
             เพิ่มข้อมูลสมาชิก
           </v-btn>
         </v-col>
@@ -73,7 +40,7 @@
             <v-toolbar flat class="bg-success text-white">
               <v-toolbar-title>
                 <v-icon
-                  icon="mdi-account-multiple"
+                  icon="mdi-account-group-outline"
                   size="x-small"
                   class="me-2"
                   color="white"
@@ -304,7 +271,6 @@
 import { ref, shallowRef, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
-import menuItemsData from "@/views/menu/menuItemsData";
 import AppBar from "@/views/appbar/AppBar.vue";
 import { API_BASE_URL } from "@/assets/config";
 
@@ -319,7 +285,7 @@ const dialog = shallowRef(false);
 const isEditing = shallowRef(false);
 
 // รายการเมนู ดึงมาจากไฟล์แยก
-const menuItems = menuItemsData;
+// const menuItems = menuItemsData;
 
 // ค่าตั้งต้นสำหรับฟอร์มข้อมูลผู้ใช้
 const DEFAULT_RECORD = {
@@ -422,15 +388,21 @@ onMounted(() => {
 const fetchUsers = async () => {
   try {
     const token = localStorage.getItem("access_token");
+    // console.log("API token:", token);
     const response = await axios.get(`${API_BASE_URL}/user`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    // console.log("API Response:", response.data.users);
     users.value = response.data.users;
   } catch (error) {
     console.error("Error fetching users:", error);
     showSnackbar("เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้", "error");
+
+    return router.push("/login");
+    
   }
 };
 
@@ -506,7 +478,6 @@ async function save() {
     };
 
     if (isEditing.value) {
-      // ตรวจรหัสผ่าน
       // console.log("payload before update:", payload);
       // แก้ไข
       await axios.put(
@@ -552,18 +523,6 @@ async function save() {
   }
 }
 
-// ฟังก์ชันจัดการคลิกเมนูด้านข้าง
-const handleMenuClick = (item) => {
-  if (item.click === "logout") {
-    // Logout: ลบ token และไปหน้า login
-    localStorage.removeItem("access_token");
-    router.push("/login");
-  } else if (item.href) {
-    // ไปหน้าที่กำหนดในเมนู
-    router.push(item.href);
-  }
-};
-
 // ฟังก์ชันปุ่มกลับไปหน้าหลัก
 const goBack = () => {
   router.push("/home");
@@ -580,57 +539,4 @@ const headers = [
 ];
 </script>
 
-<style scoped>
-.custom-table {
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.custom-table th {
-  font-weight: bold;
-}
-
-.ellipsis {
-  display: inline-block;
-  max-width: 200px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.btn-back {
-  margin-right: 8px;
-}
-
-.dialog-popup {
-  border-radius: 8px;
-}
-
-.dialog-title {
-  font-size: 1.25rem;
-  font-weight: 500;
-}
-
-.confirm-delete-dialog {
-  border-radius: 8px;
-}
-
-.confirm-delete-title {
-  background-color: #f44336;
-  color: white;
-  padding: 16px;
-}
-
-.confirm-delete-text {
-  padding: 20px 16px;
-  font-size: 1rem;
-}
-
-.confirm-delete-actions {
-  padding: 8px 16px 16px;
-}
-
-.snackbar-fullscreen {
-  border-radius: 0;
-}
-</style>
+<style scoped></style>
