@@ -1,0 +1,41 @@
+สร้าง Project vuetify
+1.npm create vuetify
+2.Project name: frontend
+3.Default (Adds routing, ESLint & SASS variables) เลือก
+4.Use TypeScript? › No
+5.npm
+6.Install Dependencies? › Yes
+7.cd frontend
+8.npm run dev
+
+//Fast API macOS pyhon3 Windows python
+1. python3 -m venv env //ใช้ venv (Python Virtual Environment): project จะได้ไม่เหมือนกัน  //python -m venv env
+2. source env/bin/activate and env\Scripts\activate //activate env
+3. (env)>pip install Flask flask-cors flask-jwt-extended python-dotenv mysql-connector-python
+4. (env)>pip list //ตรวจสอบ version ที่ติดตั้ง
+7. (evn)>pip install fastapi uvicorn
+8. สร้างไฟล์ .env และ app.py
+9. (env)>uvicorn app:app --reload //run ไฟล์ app.py
+10. http://127.0.0.1:8000/docs
+
+11.(env)>pip install bcrypt //แฮชรหัสผ่านก่อนบันทึก
+
+
+ติดตั้งใน vuetify
+1.>npm install axios
+
+คำสั้ง run
+	1.flask run
+	2.python app.py
+	2.uvicorn app:app --reload
+ออกจาก env
+	1.python3 -m venv .venv
+	2.deactivate
+
+Login
+admin
+123456
+
+ย้ายเครื่อง >npm install
+icon Vutify : https://pictogrammers.com/library/mdi/
+color Html: https://www.designil.com/300-color-code/
