@@ -39,3 +39,10 @@ admin
 ย้ายเครื่อง >npm install
 icon Vutify : https://pictogrammers.com/library/mdi/
 color Html: https://www.designil.com/300-color-code/
+
+ไฟล์ .env
+# สร้างฟังก์ชันเชื่อม MySQL ใช้ค่าจาก .env
+DB_HOST=localhost
+DB_USER=root
+DB_PASS=""
+DB_DATABASE=smart_care
