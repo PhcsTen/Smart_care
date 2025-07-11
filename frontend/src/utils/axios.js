@@ -4,9 +4,12 @@ import { API_BASE_URL } from "@/assets/config";
 const instance = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
+  headers: {
+    "Content-Type": "application/json", // ✅ จำเป็นสำหรับ POST/PUT
+  },
 });
 
-// เพิ่ม token อัตโนมัติในทุก request
+// เพิ่ม token อัตโนมัติ
 instance.interceptors.request.use((config) => {
   const token = localStorage.getItem("access_token");
   if (token) {
@@ -21,7 +24,7 @@ instance.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("access_token");
-      window.location.href = "/login"; // redirect อัตโนมัติ
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }
