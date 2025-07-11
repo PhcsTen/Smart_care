@@ -188,7 +188,7 @@
 <script setup>
 import { ref, shallowRef, computed, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import axios from "@/utils/axios"; // ใช้ instance แทน
 import dayjs from "dayjs";
 import "dayjs/locale/th";
 import buddhistEra from "dayjs/plugin/buddhistEra";
