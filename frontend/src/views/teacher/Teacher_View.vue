@@ -121,7 +121,7 @@
 <script setup>
 import { ref, shallowRef, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import axios from "@/utils/axios"; // ใช้ instance แทน
 import AppBar from "@/views/appbar/AppBar.vue";
 import { API_BASE_URL } from "@/assets/config";
 
