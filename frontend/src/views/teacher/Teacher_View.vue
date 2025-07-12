@@ -74,7 +74,7 @@
               <td style="color: black">{{ item.full_name }}</td>
               <td style="color: black">{{ item.email }}</td>
               <td style="color: black">{{ item.phone_number || "-" }}</td>
-              <td style="color: black">{{ item.school_name || '-' }}</td>
+              <td style="color: black">{{ item.school_name || "-" }}</td>
               <td class="text-center">
                 <v-avatar
                   color="yellow darken-2"
@@ -102,6 +102,37 @@
         </v-data-table>
       </v-sheet>
     </v-container>
+
+    <!-- Dialog ยืนยันการลบผู้ใช้ -->
+    <v-dialog v-model="confirmDeleteDialog" max-width="400">
+      <v-card class="confirm-delete-dialog">
+        <v-card-title class="text-h6 confirm-delete-title"
+          >ยืนยันการลบ</v-card-title
+        >
+        <v-card-text class="confirm-delete-text"
+          >คุณต้องการครูใช่หรือไม่?</v-card-text
+        >
+        <v-card-actions class="confirm-delete-actions">
+          <v-spacer />
+          <!-- ปุ่มยกเลิก -->
+          <v-btn
+            color="red-darken-1"
+            variant="flat"
+            class="text-white"
+            @click="confirmDeleteDialog = false"
+            >ยกเลิก</v-btn
+          >
+          <!-- ปุ่มยืนยันลบ -->
+          <v-btn
+            color="green-darken-1"
+            variant="flat"
+            class="text-white"
+            @click="confirmDelete"
+            >ลบ</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <!-- Dialog เพิ่ม/แก้ไข -->
     <v-dialog v-model="dialog" persistent max-width="850">
@@ -241,6 +272,10 @@ const snackbar = ref({
   color: "success",
 });
 
+// ตัวแปรควบคุม Dialog ยืนยันลบ และเก็บ id ที่จะลบ
+const confirmDeleteDialog = ref(false);
+const deleteId = ref(null);
+
 // Record form
 const record = ref({
   teacher_id: null,
@@ -291,7 +326,9 @@ const fetchTeachers = async () => {
 
     teachers.value = data.map((t) => ({
       ...t,
-      full_name: `${t.prefix_name || ""}${t.first_name || ""} ${t.last_name || ""}`,
+      full_name: `${t.prefix_name || ""}${t.first_name || ""} ${
+        t.last_name || ""
+      }`,
     }));
   } catch (error) {
     console.error("โหลดข้อมูลครูล้มเหลว", error);
@@ -331,23 +368,29 @@ const editTeacher = (teacher) => {
 };
 
 const confirmRemove = (id) => {
-  if (confirm("คุณแน่ใจว่าต้องการลบข้อมูลนี้?")) {
-    deleteTeacher(id);
-  }
+  deleteId.value = id;
+  confirmDeleteDialog.value = true;
 };
 
-const deleteTeacher = async (id) => {
+// แก้ไขเมธอด confirmDelete ให้ถูกต้อง
+async function confirmDelete() {
   try {
     const token = localStorage.getItem("access_token");
-    await axios.delete(`${API_BASE_URL}/teacher/delete/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
+    await axios.delete(`${API_BASE_URL}/teacher/delete/${deleteId.value}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
-    fetchTeachers();
+    // แก้ไขจาก teacher.value เป็น teachers.value
+    teachers.value = teachers.value.filter((teacher) => teacher.teacher_id !== deleteId.value);
+    showSnackbar("ลบครูสำเร็จ!", "success"); // เปลี่ยนจาก "error" เป็น "success"
   } catch (error) {
-    console.error("ลบข้อมูลล้มเหลว", error);
+    showSnackbar("เกิดข้อผิดพลาดในการลบครู", "error");
+    console.error("Error deleting teacher:", error);
+  } finally {
+    confirmDeleteDialog.value = false;
   }
-};
-
+}
 const save = async () => {
   try {
     const token = localStorage.getItem("access_token");
