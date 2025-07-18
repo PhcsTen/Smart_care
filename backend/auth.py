@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
 from db import get_db_connection
 import bcrypt
+from flask_cors import CORS
 
 auth_bp = Blueprint("auth_bp", __name__)
 
@@ -17,7 +18,7 @@ def login():
     username = data.get("username")
     password = data.get("password")
 
-    # print("username:",username)
+    print("username:",username)
     # print("password:",password)
 
     if not username or not password:

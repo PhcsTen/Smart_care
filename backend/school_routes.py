@@ -7,7 +7,7 @@ import traceback
 
 school_bp = Blueprint("school_bp", __name__)
 
-# สร้าง API GET สำหรับดึงข้อมูล year
+# สร้าง API GET สำหรับดึงข้อมูล school
 @school_bp.route("/school", methods=["GET"])
 @jwt_required()
 def get_school_info():

@@ -9,12 +9,13 @@ from classrooms_routes import classrooms_bp
 from school_routes import school_bp
 from teacher_routes import teacher_bp
 from classes_routes import classes_bp
+from student_routes import student_bp
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = Config.JWT_SECRET_KEY
 
 # ตั้งค่า CORS เฉพาะ origin http://localhost:3000 และรองรับ credentials
-CORS(app, origins=["http://localhost:3000"], supports_credentials=True)
+CORS(app, origins=["http://localhost:8081","http://localhost:3000"], supports_credentials=True)
 
 jwt = JWTManager(app)
 
@@ -26,6 +27,7 @@ app.register_blueprint(classrooms_bp)
 app.register_blueprint(school_bp)
 app.register_blueprint(teacher_bp)
 app.register_blueprint(classes_bp)
+app.register_blueprint(student_bp)
 
 if __name__ == "__main__":
     app.run(debug=True)
