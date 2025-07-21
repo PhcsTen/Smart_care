@@ -74,6 +74,7 @@
               >
                 <td style="color: black">{{ index + 1 }}</td>
                 <td style="color: black">{{ item.student_fullname }}</td>
+                <td style="color: black">{{ item.classroom_name }}</td>
                 <td class="text-center">
                   <v-avatar
                     :color="item.health_id ? 'green' : 'black'"
@@ -98,11 +99,13 @@
                 </td>
                 <td class="text-center">
                   <v-avatar
-                    color="red darken-1"
+                    :color="item.health_id ? 'red darken-1' : 'grey'"
                     size="32"
                     class="elevation-1"
                     style="cursor: pointer"
-                    @click="confirmRemove(item.teacher_id)"
+                    @click="
+                      item.health_id ? confirmRemove(item.teacher_id) : ''
+                    "
                   >
                     <v-icon color="white" icon="mdi-delete" size="20" />
                   </v-avatar>
@@ -412,19 +415,72 @@
                   </v-card-text>
                 </v-card>
               </v-col>
-              <v-col cols="12" sm="6">
+              <v-col cols="12" sm="12">
                 <v-text-field
                   v-model="record.notes"
                   label="หมายเหตุ"
                   variant="outlined"
                 />
               </v-col>
-              <v-col cols="12" sm="6">
-                <v-text-field
+              <!-- รูปภาพ -->
+              <v-col cols="12" sm="12">
+                <!-- <v-text-field
                   v-model="record.student_photo"
                   label="รูปภาพ"
                   variant="outlined"
-                />
+                /> -->
+                <v-card variant="outlined" class="mx-auto" max-width="100%">
+                  <v-card-title style="font-size: 1.1rem">
+                    รูปภาพนักเรียน
+                  </v-card-title>
+                  <v-card-text>
+                    <v-btn @click="openCamera" color="primary">
+                      <v-icon color="white" icon="mdi-camera" />
+                      &nbsp;&nbsp;ถ่ายรูป
+                    </v-btn>
+                    <!-- input กล้อง -->
+                    <input
+                      ref="fileInput"
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      @change="onFileChange"
+                      style="display: none"
+                    />
+
+                    <!-- รูปตัวอย่าง -->
+                    <div v-if="imageUrl" style="margin-top: 20px">
+                      <h3>รูปตัวอย่าง:</h3>
+                      <v-img
+                        :src="imageUrl"
+                        alt="preview"
+                        max-width="250"
+                        max-height="250"
+                        class="mx-auto"
+                        style="border-radius: 12px; border: 1px solid #ccc"
+                      />
+                    </div>
+
+                    <!-- แสดงภาพจากฐานข้อมูล หากยังไม่มี preview -->
+                    <div
+                      v-else-if="record?.student_photo"
+                      class="mt-2 text-center"
+                    >
+                      <v-img
+                        :src="getStudentImageUrl(record.student_photo)"
+                        max-width="250"
+                        max-height="250"
+                        class="mx-auto"
+                        style="border-radius: 12px; border: 1px solid #ccc"
+                      />
+                    </div>
+
+                    <!-- fallback ถ้าไม่มีภาพเลย -->
+                    <div v-else class="text-grey mt-2 text-center">
+                      ยังไม่มีรูปภาพ
+                    </div>
+                  </v-card-text>
+                </v-card>
               </v-col>
             </v-row>
           </v-card-text>
@@ -473,7 +529,7 @@ import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 // import axios from "@/utils/axios"; // ใช้ instance แทน
 import AppBar from "@/views/appbar/AppBar.vue";
-// import { API_BASE_URL } from "@/assets/config";
+import { API_BASE_URL } from "@/assets/config";
 
 // import studentsData from "@/data/students.json";
 import healthRecordsData from "@/data_mockup/health_records.json";
@@ -532,26 +588,77 @@ const showSnackbar = (message, type = "success") => {
 const headers = [
   { title: "ลำดับ", key: "index" },
   { title: "ชื่อ-สกุล", key: "student_fullname" },
+  { title: "ห้อง", key: "classroom_name" },
   { title: "เช็คชื่อ", key: "view", align: "center" },
   { title: "ลบ", key: "delete", align: "center" },
 ];
+
+// ตัวแปร
+const fileInput = ref(null);
+const imageFile = ref(null);
+const imageUrl = ref(null);
+
+// ฟังก์ชันเปิดกล้อง
+const openCamera = () => {
+  fileInput.value.click();
+};
+
+// เมื่อเลือกรูป / ถ่ายรูป
+const onFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    imageFile.value = file;
+    imageUrl.value = URL.createObjectURL(file);
+  }
+};
+
+// ฟังก์ชันโหลดรูปภาพ
+const getStudentImageUrl = (filename) => {
+  if (!filename) return "";
+  return `${API_BASE_URL}/uploads/${filename}`; // เปลี่ยน URL ตามจริง
+};
+
+// ฟังก์ชันอัปโหลดรูป (ตัวอย่าง POST ไป backend)
+// const uploadImage = async () => {
+//   if (!imageFile.value) return;
+
+//   const formData = new FormData();
+//   formData.append("image", imageFile.value);
+
+//   try {
+//     const res = await fetch("https://your-backend/upload", {
+//       method: "POST",
+//       body: formData,
+//     });
+
+//     if (res.ok) {
+//       alert("อัปโหลดสำเร็จ!");
+//     } else {
+//       alert("อัปโหลดไม่สำเร็จ");
+//     }
+//   } catch (err) {
+//     console.error("Upload failed:", err);
+//     alert("เกิดข้อผิดพลาด");
+//   }
+// };
 
 // Validation
 const required = (v) => !!v || "จำเป็นต้องกรอก";
 const isHealthFormValid = computed(() => {
   const r = record.value;
-  return (
-    r.student_id &&
-    r.attendance_status &&
-    r.nails_status &&
-    r.hair_status &&
-    r.teeth_status &&
-    r.body_status &&
-    r.eye_status &&
-    r.ear_status &&
-    r.nose_status &&
-    r.student_photo
-  );
+  return r.student_id && r.attendance_status;
+  // return (
+  //   r.student_id &&
+  //   r.attendance_status &&
+  //   r.nails_status &&
+  //   r.hair_status &&
+  //   r.teeth_status &&
+  //   r.body_status &&
+  //   r.eye_status &&
+  //   r.ear_status &&
+  //   r.nose_status &&
+  //   r.student_photo
+  // );
 });
 
 const formatThaiDate = (date) => {
@@ -560,31 +667,6 @@ const formatThaiDate = (date) => {
   const year = date.getFullYear() + 543;
   return `${day}/${month}/${year}`;
 };
-
-// const fetchStudentsByClassroom = async () => {
-//   try {
-//     // const token = localStorage.getItem("access_token");
-//     // const response = await axios.get(`${API_BASE_URL}/student_by_classroom`, {
-//     //   headers: { Authorization: `Bearer ${token}` },
-//     // });
-
-//     // const data = response.data.students || [];
-//     //console.log("response.data.teachers:", response.data.teachers);
-
-//     students.value = studentsData;
-//     console.log("studentsData:", studentsData);
-
-//     // students.value = data.map((t) => ({
-//     students.value = studentsData.map((t) => ({
-//       ...t,
-//       full_name: `${t.prefix_name || ""}${t.first_name || ""} ${
-//         t.last_name || ""
-//       }`,
-//     }));
-//   } catch (error) {
-//     console.error("โหลดข้อมูลนักเรียนล้มเหลว", error);
-//   }
-// };
 
 const fetchHealthRecords = async () => {
   try {
@@ -603,6 +685,7 @@ const fetchHealthRecords = async () => {
 
 const toggleHealth = () => {
   isEditing.value = false;
+  imageUrl.value = null;
   record.value = {
     health_id: null,
     student_id: "",
@@ -628,6 +711,7 @@ const addHealth = (healthReacord) => {
   } else {
     isEditing.value = false;
   }
+  imageUrl.value = null;
   record.value = { ...healthReacord };
   dialog.value = true;
   console.log("Add Health:", record.value);
