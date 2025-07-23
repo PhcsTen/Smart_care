@@ -449,10 +449,10 @@
                     />
 
                     <!-- รูปตัวอย่าง -->
-                    <div v-if="imageUrl" style="margin-top: 20px">
+                    <div v-if="imagePreview" style="margin-top: 20px">
                       <h3>รูปตัวอย่าง:</h3>
                       <v-img
-                        :src="imageUrl"
+                        :src="imagePreview"
                         alt="preview"
                         max-width="250"
                         max-height="250"
@@ -527,12 +527,12 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
-// import axios from "@/utils/axios"; // ใช้ instance แทน
+import axios from "@/utils/axios";
 import AppBar from "@/views/appbar/AppBar.vue";
 import { API_BASE_URL } from "@/assets/config";
 
 // import studentsData from "@/data/students.json";
-import healthRecordsData from "@/data_mockup/health_records.json";
+// import healthRecordsData from "@/data_mockup/health_records.json";
 
 // Router
 const router = useRouter();
@@ -547,7 +547,7 @@ const currentDateFormatted = ref("");
 
 // Data
 const healthRecords = ref([]);
-// const students = ref([]);
+const teacherId = ref("1");
 
 // Snackbar แจ้งเตือนสถานะ
 const snackbar = ref({
@@ -564,6 +564,7 @@ const deleteId = ref(null);
 const record = ref({
   health_id: null,
   student_id: "",
+  classroom_id: "",
   body_temperature: "",
   attendance_status: "",
   nails_status: "",
@@ -596,7 +597,7 @@ const headers = [
 // ตัวแปร
 const fileInput = ref(null);
 const imageFile = ref(null);
-const imageUrl = ref(null);
+const imagePreview = ref(null);
 
 // ฟังก์ชันเปิดกล้อง
 const openCamera = () => {
@@ -608,7 +609,7 @@ const onFileChange = (event) => {
   const file = event.target.files[0];
   if (file) {
     imageFile.value = file;
-    imageUrl.value = URL.createObjectURL(file);
+    imagePreview.value = URL.createObjectURL(file);
   }
 };
 
@@ -668,27 +669,29 @@ const formatThaiDate = (date) => {
   return `${day}/${month}/${year}`;
 };
 
-const fetchHealthRecords = async () => {
+const fetchStudentHealthRecords = async () => {
   try {
-    // const token = localStorage.getItem("access_token");
-    // const response = await axios.get(`${API_BASE_URL}/school`, {
-    //   headers: { Authorization: `Bearer ${token}` },
-    // });
-    // healthRecords.value = response.data.healthRecords || [];
-
-    healthRecords.value = healthRecordsData;
-    console.log("healthRecordsData:", healthRecordsData);
+    const token = localStorage.getItem("access_token");
+    const response = await axios.get(
+      `${API_BASE_URL}/student_health_records/${teacherId.value}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    console.log("fetchStudentHealthRecords:", response.data);
+    healthRecords.value = response.data.health_records || [];
   } catch (error) {
-    console.error("โหลดข้อมูลตรวจสุขภาพล้มเหลว", error);
+    console.error("โหลดข้อมูลนักเรียนล้มเหลว", error);
   }
 };
 
 const toggleHealth = () => {
   isEditing.value = false;
-  imageUrl.value = null;
+  imagePreview.value = null;
   record.value = {
     health_id: null,
     student_id: "",
+    classroom_id: null,
     body_temperature: "",
     attendance_status: "",
     nails_status: "",
@@ -711,7 +714,7 @@ const addHealth = (healthReacord) => {
   } else {
     isEditing.value = false;
   }
-  imageUrl.value = null;
+  imagePreview.value = null;
   record.value = { ...healthReacord };
   dialog.value = true;
   console.log("Add Health:", record.value);
@@ -751,6 +754,7 @@ const save = async () => {
     const payload = {
       health_id: record.value.health_id,
       student_id: record.value.student_id,
+      classroom_id: record.value.classroom_id,
       body_temperature: record.value.body_temperature,
       attendance_status: record.value.attendance_status,
       nails_status: record.value.nails_status,
@@ -761,7 +765,7 @@ const save = async () => {
       ear_status: record.value.ear_status,
       nose_status: record.value.nose_status,
       notes: record.value.notes,
-      student_photo: record.value.student_photo,
+      student_photo: imagePreview.value,
     };
     const config = {
       headers: {
@@ -803,7 +807,7 @@ onMounted(() => {
   }
 
   // fetchStudentsByClassroom();
-  fetchHealthRecords();
+  fetchStudentHealthRecords();
 
   const today = new Date();
   currentDateFormatted.value = formatThaiDate(today);
