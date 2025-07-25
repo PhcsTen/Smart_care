@@ -73,6 +73,7 @@
                 }"
               >
                 <td style="color: black">{{ index + 1 }}</td>
+                <td style="color: black">{{ item.student_code }}</td>
                 <td style="color: black">{{ item.student_fullname }}</td>
                 <td style="color: black">{{ item.classroom_name }}</td>
                 <td class="text-center">
@@ -103,9 +104,7 @@
                     size="32"
                     class="elevation-1"
                     style="cursor: pointer"
-                    @click="
-                      item.health_id ? confirmRemove(item.teacher_id) : ''
-                    "
+                    @click="item.health_id ? confirmRemove(item.health_id) : ''"
                   >
                     <v-icon color="white" icon="mdi-delete" size="20" />
                   </v-avatar>
@@ -531,9 +530,6 @@ import axios from "@/utils/axios";
 import AppBar from "@/views/appbar/AppBar.vue";
 import { API_BASE_URL } from "@/assets/config";
 
-// import studentsData from "@/data/students.json";
-// import healthRecordsData from "@/data_mockup/health_records.json";
-
 // Router
 const router = useRouter();
 
@@ -588,6 +584,7 @@ const showSnackbar = (message, type = "success") => {
 // Table headers
 const headers = [
   { title: "ลำดับ", key: "index" },
+  { title: "รหัสนักเรียน", key: "student_code" },
   { title: "ชื่อ-สกุล", key: "student_fullname" },
   { title: "ห้อง", key: "classroom_name" },
   { title: "เช็คชื่อ", key: "view", align: "center" },
@@ -728,17 +725,18 @@ const confirmRemove = (id) => {
 // แก้ไขเมธอด confirmDelete ให้ถูกต้อง
 async function confirmDelete() {
   try {
-    // const token = localStorage.getItem("access_token");
-    // await axios.delete(`${API_BASE_URL}/teacher/delete/${deleteId.value}`, {
-    //   headers: {
-    //     Authorization: `Bearer ${token}`,
-    //   },
-    // });
-    // แก้ไขจาก teacher.value เป็น teachers.value
-    // teachers.value = teachers.value.filter(
-    //   (teacher) => teacher.teacher_id !== deleteId.value
-    // );
+    const token = localStorage.getItem("access_token");
+    await axios.delete(
+      `${API_BASE_URL}/health_records/delete/${deleteId.value}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
     showSnackbar("ลบข้อมูลสำเร็จ!", "success");
+    fetchStudentHealthRecords;
   } catch (error) {
     showSnackbar("เกิดข้อผิดพลาดในการลบข้อมูล", "error");
     console.error("Error deleting data:", error);
@@ -776,19 +774,24 @@ const save = async () => {
     console.log("token :", config);
     console.log("payload :", payload);
 
-    // if (isEditing.value) {
-    //   await axios.put(
-    //     `${API_BASE_URL}/teacher/update/${payload.teacher_id}`,
-    //     payload,
-    //     config
-    //   );
-    // } else {
-    //   await axios.post(`${API_BASE_URL}/teacher/insert`, payload, config);
-    //   showSnackbar("เพิ่มผู้ใช้สำเร็จ!", "success");
-    // }
+    if (isEditing.value) {
+      await axios.put(
+        `${API_BASE_URL}/health_records/update/${payload.health_id}`,
+        payload,
+        config
+      );
+      showSnackbar("อัปเดตข้อมูลตรวจสุขภาพ/เช็คชื่อสำเร็จ!", "success");
+    } else {
+      await axios.post(
+        `${API_BASE_URL}/health_records/insert`,
+        payload,
+        config
+      );
+      showSnackbar("เพิ่มข้อมูลตรวจสุขภาพ/เช็คชื่อสำเร็จ!", "success");
+    }
 
     dialog.value = false;
-    // fetchTeachers(); // โหลดข้อมูลใหม่
+    fetchStudentHealthRecords();
   } catch (error) {
     if (error.response?.status === 401) {
       localStorage.removeItem("access_token");
@@ -806,7 +809,6 @@ onMounted(() => {
     return;
   }
 
-  // fetchStudentsByClassroom();
   fetchStudentHealthRecords();
 
   const today = new Date();
