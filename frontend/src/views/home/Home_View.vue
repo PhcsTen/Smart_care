@@ -58,14 +58,14 @@ onMounted(() => {
   }
 });
 const services = [
-  // {
-  //   index: "1",
-  //   name: "เซ็คชื่อ/ตรวจสุขภาพเด็ก",
-  //   icon: "mdi-home",
-  //   color: "success",
-  //   background: "#e0f7fa",
-  //   router: "",
-  // },
+  {
+    index: "1",
+    name: "เซ็คชื่อ/ตรวจสุขภาพเด็ก",
+    icon: "mdi-home",
+    color: "success",
+    background: "#e0f7fa",
+    router: "/health",
+  },
   // {
   //   index: "2",
   //   name: "บันทึกกิจกรรมประจำวัน",
@@ -157,9 +157,7 @@ const services = [
     icon: "mdi-cog",
     router: "",
   },
-  
 ];
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

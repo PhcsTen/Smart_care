@@ -12,9 +12,9 @@
             </v-btn>
           </v-col>
           <v-col cols="auto" class="pa-0 ml-3">
-            <v-btn color="success" @click="toggleHealth">
-              <v-icon start>mdi-plus-box</v-icon>
-              เพิ่มข้อมูลตรวจสุขภาพ
+            <v-btn color="success" @click="scanQR">
+              <v-icon start>mdi-qrcode-scan</v-icon>
+              Scan QR Code
             </v-btn>
           </v-col>
         </v-row>
@@ -212,7 +212,6 @@
                       <v-btn value="leave" style="font-size: 1rem"> ลา </v-btn>
                       <v-btn value="sick" style="font-size: 1rem"> ป่วย </v-btn>
                     </v-btn-toggle>
-                    {{ record.attendance_status }}
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -246,7 +245,6 @@
                             <v-icon icon="mdi-close-thick" />
                           </v-btn>
                         </v-btn-toggle>
-                        {{ record.nails_status }}
                       </v-col>
                     </v-row>
                     <v-row>
@@ -273,7 +271,6 @@
                             <v-icon icon="mdi-close-thick" />
                           </v-btn>
                         </v-btn-toggle>
-                        {{ record.hair_status }}
                       </v-col>
                     </v-row>
                     <v-row>
@@ -300,7 +297,6 @@
                             <v-icon icon="mdi-close-thick" />
                           </v-btn>
                         </v-btn-toggle>
-                        {{ record.teeth_status }}
                       </v-col>
                     </v-row>
                     <v-row>
@@ -327,7 +323,6 @@
                             <v-icon icon="mdi-close-thick" />
                           </v-btn>
                         </v-btn-toggle>
-                        {{ record.body_status }}
                       </v-col>
                     </v-row>
                     <v-row>
@@ -354,7 +349,6 @@
                             <v-icon icon="mdi-close-thick" />
                           </v-btn>
                         </v-btn-toggle>
-                        {{ record.eye_status }}
                       </v-col>
                     </v-row>
                     <v-row>
@@ -381,7 +375,6 @@
                             <v-icon icon="mdi-close-thick" />
                           </v-btn>
                         </v-btn-toggle>
-                        {{ record.nose_status }}
                       </v-col>
                     </v-row>
                     <v-row>
@@ -408,7 +401,6 @@
                             <v-icon icon="mdi-close-thick" />
                           </v-btn>
                         </v-btn-toggle>
-                        {{ record.ear_status }}
                       </v-col>
                     </v-row>
                   </v-card-text>
@@ -423,11 +415,6 @@
               </v-col>
               <!-- รูปภาพ -->
               <v-col cols="12" sm="12">
-                <!-- <v-text-field
-                  v-model="record.student_photo"
-                  label="รูปภาพ"
-                  variant="outlined"
-                /> -->
                 <v-card variant="outlined" class="mx-auto" max-width="100%">
                   <v-card-title style="font-size: 1.1rem">
                     รูปภาพนักเรียน
@@ -466,7 +453,12 @@
                       class="mt-2 text-center"
                     >
                       <v-img
-                        :src="getStudentImageUrl(record.student_photo)"
+                        :src="
+                          getStudentImageUrl(
+                            record.photo_path,
+                            record.student_photo
+                          )
+                        "
                         max-width="250"
                         max-height="250"
                         class="mx-auto"
@@ -543,7 +535,7 @@ const currentDateFormatted = ref("");
 
 // Data
 const healthRecords = ref([]);
-const teacherId = ref("1");
+const teacherId = ref("1"); // TODO
 
 // Snackbar แจ้งเตือนสถานะ
 const snackbar = ref({
@@ -572,6 +564,7 @@ const record = ref({
   nose_status: "",
   notes: "",
   student_photo: "",
+  photo_path: "",
 });
 
 // แสดง snackbar แจ้งเตือน
@@ -606,39 +599,26 @@ const onFileChange = (event) => {
   const file = event.target.files[0];
   if (file) {
     imageFile.value = file;
-    imagePreview.value = URL.createObjectURL(file);
+    // imagePreview.value = URL.createObjectURL(file);
+
+    // สร้าง URL สำหรับแสดงภาพตัวอย่าง
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      imagePreview.value = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  } else {
+    imagePreview.value = null;
+    imageFile.value = null;
   }
 };
 
 // ฟังก์ชันโหลดรูปภาพ
-const getStudentImageUrl = (filename) => {
+const getStudentImageUrl = (path, filename) => {
   if (!filename) return "";
-  return `${API_BASE_URL}/uploads/${filename}`; // เปลี่ยน URL ตามจริง
+  const imagePath = `${path}/${filename}`;
+  return `${API_BASE_URL}/${imagePath}`; // เปลี่ยน URL ตามจริง
 };
-
-// ฟังก์ชันอัปโหลดรูป (ตัวอย่าง POST ไป backend)
-// const uploadImage = async () => {
-//   if (!imageFile.value) return;
-
-//   const formData = new FormData();
-//   formData.append("image", imageFile.value);
-
-//   try {
-//     const res = await fetch("https://your-backend/upload", {
-//       method: "POST",
-//       body: formData,
-//     });
-
-//     if (res.ok) {
-//       alert("อัปโหลดสำเร็จ!");
-//     } else {
-//       alert("อัปโหลดไม่สำเร็จ");
-//     }
-//   } catch (err) {
-//     console.error("Upload failed:", err);
-//     alert("เกิดข้อผิดพลาด");
-//   }
-// };
 
 // Validation
 const required = (v) => !!v || "จำเป็นต้องกรอก";
@@ -682,27 +662,8 @@ const fetchStudentHealthRecords = async () => {
   }
 };
 
-const toggleHealth = () => {
-  isEditing.value = false;
-  imagePreview.value = null;
-  record.value = {
-    health_id: null,
-    student_id: "",
-    classroom_id: null,
-    body_temperature: "",
-    attendance_status: "",
-    nails_status: "",
-    hair_status: "",
-    teeth_status: "",
-    body_status: "",
-    eye_status: "",
-    ear_status: "",
-    nose_status: "",
-    notes: "",
-    student_photo: "",
-  };
-  dialog.value = true;
-  // router.push("/health_records_add");
+const scanQR = () => {
+  console.log("Scan QR Code");
 };
 
 const addHealth = (healthReacord) => {
@@ -736,7 +697,7 @@ async function confirmDelete() {
     );
 
     showSnackbar("ลบข้อมูลสำเร็จ!", "success");
-    fetchStudentHealthRecords;
+    fetchStudentHealthRecords();
   } catch (error) {
     showSnackbar("เกิดข้อผิดพลาดในการลบข้อมูล", "error");
     console.error("Error deleting data:", error);
