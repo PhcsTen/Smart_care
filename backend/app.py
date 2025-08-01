@@ -11,6 +11,7 @@ from teacher_routes import teacher_bp
 from classes_routes import classes_bp
 from student_routes import student_bp
 from health_records_routes import health_records_bp
+from behavior_records_routes import behavior_records_bp
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = Config.JWT_SECRET_KEY
@@ -30,6 +31,7 @@ app.register_blueprint(teacher_bp)
 app.register_blueprint(classes_bp)
 app.register_blueprint(student_bp)
 app.register_blueprint(health_records_bp)
+app.register_blueprint(behavior_records_bp)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -80,13 +80,13 @@ const services = [
   //   icon: "mdi-chat",
   //   router: "",
   // },
-  // {
-  //   index: "4",
-  //   name: "บันทึกสังเกตพฤติกรรม",
-  //   color: "purple",
-  //   icon: "mdi-chart-bar",
-  //   router: "",
-  // },
+  {
+    index: "4",
+    name: "บันทึกสังเกตพฤติกรรม",
+    color: "purple",
+    icon: "mdi-chart-bar",
+    router: "/behavior",
+  },
   // {
   //   index: "5",
   //   name: "แหล่งเรียนรู้",

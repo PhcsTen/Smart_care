@@ -8,12 +8,14 @@ import students from "../views/students/Sudents.vue";
 import students_view from "../views/students/Students_View.vue";
 import years from "../views/years/Years.vue";
 import years_view from "../views/years/Years_View.vue";
-import classrooms from "../views/classrooms/classrooms.vue";
-import classrooms_view from "../views/classrooms/classrooms_View.vue";
+import classrooms from "../views/classrooms/Classrooms.vue";
+import classrooms_view from "../views/classrooms/Classrooms_View.vue";
 import teacher from "../views/teacher/Teacher.vue";
 import teacher_view from "../views/teacher/Teacher_View.vue";
 import health_records from "../views/health_records/HealthRecords.vue";
 import health_records_view from "../views/health_records/HealthRecords_View.vue";
+import behavior_records from "@/views/behavior_records/BehaviorRecords.vue";
+import behavior_records_View from "@/views/behavior_records/BehaviorRecords_View.vue";
 
 const routes = [
   { path: "/", redirect: "/login" },
@@ -55,6 +57,11 @@ const routes = [
     path: "/health",
     component: health_records,
     children: [{ path: "", component: health_records_view }],
+  },
+  {
+    path: "/behavior",
+    component: behavior_records,
+    children: [{ path: "", component: behavior_records_View }],
   },
 ];
 
